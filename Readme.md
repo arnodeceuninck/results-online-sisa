@@ -30,8 +30,12 @@ Change `ExecStart` in `systemd/sisa-results.service` to the location on your mac
 Copy these files to your `/etc/systemd/system` directory and enable the service. 
 ```shell
 sudo cp systemd/* /etc/systemd/system/
-sudo systemctl enable sisa-results.timer
+sudo systemctl enable sisa-results.timer --now
 ```
+In `get_page_driver` (`main.py`), change opts.headless to `True`. This runs your browser in the background.  
 
 ## Note
 Once it has found results, it stops running. If you want to check again, you can remove `online.pickle`
+
+## TODO's
+- [ ] Check whether pickle still works when running as service
