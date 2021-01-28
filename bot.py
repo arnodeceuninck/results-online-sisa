@@ -12,10 +12,19 @@ async def on_ready():
 
 @bot.command()
 async def sisa(ctx):
-    if results_online(check=False, post=False):
-        await ctx.message.reply("De punten staan online")
-    else:
-        await ctx.message.reply("De punten staan nog niet online")
+    try:
+        if results_online(check=False, post=False):
+            await ctx.message.reply("De punten staan online")
+        else:
+            await ctx.message.reply("De punten staan nog niet online")
+    except Exception as e:
+        await ctx.message.reply("Error")
+        raise e
+
+
+@bot.command()
+async def sping(ctx):
+    await ctx.message.reply("pong")
 
 
 bot.run(discord_token)
