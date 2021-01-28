@@ -1,0 +1,6 @@
+[Unit]
+Description=Check whether sisa results are online and post it in Discord if so
+
+[Service]
+Type=oneshot
+ExecStart=/home/arno/Documents/results-online-sisa/venv/bin/python /home/arno/Documents/results-online-sisa/main.py
