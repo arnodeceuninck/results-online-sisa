@@ -31,6 +31,7 @@ Copy these files to your `/etc/systemd/system` directory and enable the service.
 ```shell
 sudo cp systemd/* /etc/systemd/system/
 sudo systemctl enable sisa-results.timer --now
+sudo systemctl enable sisa-bot --now
 ```
 In `get_page_driver` (`main.py`), change opts.headless to `True`. This runs your browser in the background.  
 

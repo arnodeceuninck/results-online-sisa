@@ -1,0 +1,14 @@
+[Unit]
+Description = Bot for checking sisa
+After = network.target
+
+[Service]
+Type = simple
+ExecStart = /home/arno/Documents/results-online-sisa/venv/bin/python /home/arno/Documents/results-online-sisa/bot.py
+Restart = on-failure
+SyslogIdentifier = sisa-results
+RestartSec = 5
+TimeoutStartSec = infinity
+
+[Install]
+WantedBy = multi-user.target

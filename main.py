@@ -1,13 +1,13 @@
 from selenium import webdriver
 from time import sleep
-from config import username, password, discord_token, discord_channel_id
+from config import username, password, discord_token, discord_channel_ids
 from pickles import load_pickle, store_pickle
 
 import discord
 
 
-def main():
-    if check_online():
+def main(check=True, post=True):
+    if check and check_online():
         return
 
     driver = get_page_driver()
@@ -27,17 +27,19 @@ def main():
     # $0 is the first course in your results list
     # make sure this is a course of which you're waiting for the results
     result = driver.find_element_by_id("STDNT_ENRL_SSV1_CRSE_GRADE_OFF$1").text
+    results_online = result != ' '
 
-    if result != ' ':
+    if post and results_online:
         print("Punten staan online")
-        make_announcement("Punten staan online (volgens mijn sisa bot toch)")
+        make_announcement("Punten informatica staan online (volgens mijn sisa bot toch)")
         set_online()
     else:
         print("Nog niet online")
-        make_announcement("Punten staan nog niet online(volgens mijn sisa bot toch)")
+        # make_announcement("Punten informatica staan nog niet online (volgens mijn sisa bot toch)")
 
     driver.close()
 
+    return results_online
 
 def check_online():
     # Checks whether this script has already detected that the results are online
@@ -51,7 +53,7 @@ def set_online():
 def get_page_driver():
     # Selenium configuration
     opts = webdriver.FirefoxOptions()
-    opts.headless = False
+    opts.headless = True
     driver = webdriver.Firefox(options=opts)
     return driver
 
@@ -83,8 +85,9 @@ def make_announcement(message):
 
     @client.event
     async def on_ready():
-        channel = client.get_channel(discord_channel_id)
-        await channel.send(message)
+        for discord_channel_id in discord_channel_ids:
+            channel = client.get_channel(discord_channel_id)
+            await channel.send(message)
         await client.close()
 
     client.run(discord_token)
