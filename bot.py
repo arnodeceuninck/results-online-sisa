@@ -12,13 +12,14 @@ async def on_ready():
 
 @bot.command()
 async def sisa(ctx):
+    message = await ctx.message.reply("Checking Sisa... (this might take a while)")
     try:
         if results_online(check=False, post=False):
-            await ctx.message.reply("De punten staan online")
+            await message.edit(content="De punten staan online")
         else:
-            await ctx.message.reply("De punten staan nog niet online")
+            await message.edit(content="De punten staan nog niet online")
     except Exception as e:
-        await ctx.message.reply("Error")
+        await message.edit("Error")
         raise e
 
 
