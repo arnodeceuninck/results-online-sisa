@@ -4,6 +4,7 @@ After = network.target
 
 [Service]
 Type = simple
+WorkingDirectory = /home/arno/Documents/results-online-sisa
 ExecStart = /home/arno/Documents/results-online-sisa/venv/bin/python /home/arno/Documents/results-online-sisa/bot.py
 Restart = on-failure
 SyslogIdentifier = sisa-results

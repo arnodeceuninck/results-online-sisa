@@ -1,6 +1,10 @@
 from config import discord_token
 from discord.ext import commands
-from main import main as results_online
+from main import main as results_online, get_logged_time, get_last_message
+from threadWithRetrun import ThreadWithReturn
+
+from threading import Thread
+from time import sleep
 
 bot = commands.Bot(command_prefix="-", description="Check wether results are online")
 
@@ -11,13 +15,26 @@ async def on_ready():
 
 
 @bot.command()
-async def sisa(ctx):
+async def sisb(ctx, mode=None):
+    if mode not in ("check", "test", "run"):
+        return await ctx.message.reply(f"Parameter 'run', 'check' or 'test' must be provided.")
+
+    if mode == "check":
+        return await ctx.message.reply(f"Last automatic check was at {get_logged_time()}")
+
+    test = mode == "test"
     message = await ctx.message.reply("Checking Sisa... (this might take a while)")
     try:
-        if results_online(check=False, post=False):
-            await message.edit(content="De punten staan online")
-        else:
-            await message.edit(content="De punten staan nog niet online")
+        thread = ThreadWithReturn(target=results_online, kwargs=dict(manually=True, test=test))
+        thread.start()
+        while thread.is_alive():
+            last_message = get_last_message()
+            if message.content != last_message:
+                await message.edit(content=last_message)
+            sleep(2)
+        text = thread.join()
+        # text = results_online(manually=True, test=test)
+        await message.edit(content=text)
     except Exception as e:
         await message.edit("Error")
         raise e

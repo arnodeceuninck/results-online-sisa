@@ -3,4 +3,5 @@ Description=Check whether sisa results are online and post it in Discord if so
 
 [Service]
 Type=oneshot
+WorkingDirectory = /home/arno/Documents/results-online-sisa
 ExecStart=/home/arno/Documents/results-online-sisa/venv/bin/python /home/arno/Documents/results-online-sisa/main.py

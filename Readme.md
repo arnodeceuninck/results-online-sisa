@@ -8,6 +8,7 @@ Sends a message on Discord once the results are online.
 | Zaterdag 1 februari 2020 ? |                                        | Maandag 3 februari 2020       |
 | Zaterdag 30 januari 2021   | Vrijdag 12 februari 2021               |                               |
 |                            |                                        |                               |
+| Zaterdag 29 juni 2019 ?    |                                        | Maandag 1 juli 2019           |
 | Zaterdag 4 juli 2020 ?     |                                        | Dinsdag 7 juli 2020           |
 | Zaterdag 26 juni 2021      | Vrijdag 2 juli 2021                    |                               |
 |                            |                                        |                               |
@@ -49,6 +50,3 @@ In `get_page_driver` (`main.py`), change opts.headless to `True`. This runs your
 
 ## Note
 Once it has found results, it stops running. If you want to check again, you can remove `online.pickle`
-
-## TODO's
-- [ ] Check whether pickle still works when running as service
