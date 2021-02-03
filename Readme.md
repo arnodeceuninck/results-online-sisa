@@ -2,6 +2,18 @@
 Check whether your exam results are online.
 Sends a message on Discord once the results are online. 
 
+## Results history
+| Uiterste datum examens     | Uiterste datum bekendmaking resultaten | Datum bekendmaking resultaten |
+|----------------------------|----------------------------------------|-------------------------------|
+| Zaterdag 1 februari 2020 ? |                                        | Maandag 3 februari 2020       |
+| Zaterdag 30 januari 2021   | Vrijdag 12 februari 2021               |                               |
+|                            |                                        |                               |
+| Zaterdag 4 juli 2020 ?     |                                        | Dinsdag 7 juli 2020           |
+| Zaterdag 26 juni 2021      | Vrijdag 2 juli 2021                    |                               |
+|                            |                                        |                               |
+|                            |                                        | Maandag 9 september 2019      |
+| Zaterdag 11 september 2021 | Vrijdag 17 september 2021              |                               |
+
 ## Dependencies
 ```shell
 sudo apt install firefox-geckodriver
