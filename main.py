@@ -20,24 +20,16 @@ def main(manually=True, test=False):
     if not manually and check_online():
         return
 
-    driver = get_page_driver()
-    load_page(driver)
-    sisa_login(driver)
+    year = 0 if not test else 1  # 0 is current year, 1 previous year
+    driver = get_results_page(year)
 
-    update_status("Navigating to results...")
-    click_by_id(driver, "win0divPTNUI_LAND_REC_GROUPLET$4")
-
-    update_status("Selecting year...")
-    year_id = 0 if not test else 1  # 0 is the current year, 1 previous year
-    click_by_id(driver, f"TERM_GRID$0_row_{year_id}")
-
-    num_courses, results = check_all_courses(driver)
+    num_courses, results = check_all_courses(driver, semesters_to_check=semesters_to_check)
 
     num_results = len(results)
 
     announcement = f"Momenteel hebben we punten voor {num_results} van de {num_courses} vakken uit semester {semesters_to_check}:\n"
-    for course, result in results:
-        announcement += f"- {course}\n"
+    for course in results:
+        announcement += f"- {course.description}\n"
     if test:
         announcement += "Note: Dit is een test en gaat over de resultaten van vorig jaar. \n"
     if manually:
@@ -54,10 +46,38 @@ def main(manually=True, test=False):
     if not manually:
         log_time()
 
-    # print(results)
+    print(announcement)
     driver.close()
 
     return announcement
+
+
+def get_average():
+    total_sp = 0
+    total_sum = 0
+    for i in range(3):  # TODO: Zelf bepalen hoeveel jaren er zijn
+        print(f"Checking year {i}")
+        driver = get_results_page(i)
+        num_courses, courses = check_all_courses(driver)
+        for course in courses:
+            if not isinstance(course.result, float):
+                print(f"Skipping {course.description} with result {course.result}")
+                continue
+            total_sum += course.sp * course.result
+            total_sp += course.sp
+    avg = total_sum / total_sp
+    return avg
+
+
+def get_results_page(year_id):
+    driver = get_page_driver()
+    load_page(driver)
+    sisa_login(driver)
+    update_status("Navigating to results...")
+    click_by_id(driver, "win0divPTNUI_LAND_REC_GROUPLET$4")
+    update_status("Selecting year...")
+    click_by_id(driver, f"TERM_GRID$0_row_{year_id}")
+    return driver
 
 
 def update_status(msg):
@@ -70,23 +90,53 @@ def get_last_message():
     return last_message
 
 
-def check_all_courses(driver):
+def get_onderscheiding(avg):
+    avg *= 5  # omzetten van op 20 naar op 100
+    assert avg <= 100
+    if avg < 50:
+        return "Onvoldoende"
+    elif avg < 68:
+        return "Voldoende"
+    elif avg < 77:
+        return "Onderscheiding"
+    elif avg < 85:
+        return "Grote onderscheiding"
+    else:
+        return "Grootste onderscheiding"
+
+
+class Course:
+    def __init__(self, description, sp, semester, result):
+        self.description = description
+        self.sp = float(sp.replace(',', '.'))
+        self.semester = semester
+        # print(description)
+        try:
+            self.result = float(result.replace(',', '.'))
+        except ValueError:
+            self.result = result
+
+
+def check_all_courses(driver, semesters_to_check=None, with_results_only=True):
+    if semesters_to_check is None:
+        semesters_to_check = ["S01", "S02", "S12"]
+
     update_status(f"Checking courses of semester {semesters_to_check}...")
 
     results = []
 
     current_course_id = 0
-    num_courses = 0
+    num_courses = 0  # number of courses in the given semester (with or without result)
     while True:
         try:
-            course, result, semester = get_course_info(current_course_id, driver)
+            course = get_course_info(current_course_id, driver)
             current_course_id += 1
 
-            if semester not in semesters_to_check:
+            if course.semester not in semesters_to_check:
                 continue
 
-            if result != ' ':
-                results.append((course, result))
+            if with_results_only and course.result != None:
+                results.append(course)
 
             num_courses += 1
         except common.exceptions.NoSuchElementException:
@@ -98,15 +148,22 @@ def check_all_courses(driver):
 def get_course_info(course_id, driver):
     result = driver.find_element_by_id(f"STDNT_ENRL_SSV1_CRSE_GRADE_OFF${course_id}").text
     course = driver.find_element_by_id(f"CLASS_TBL_VW_DESCR${course_id}").text
+    sp = driver.find_element_by_id(f"STDNT_ENRL_SSV1_UNT_TAKEN${course_id}").text
     semester = driver.find_element_by_id(f"STDNT_ENRL_SSV1_SESSION_CODE${course_id}").text
-    return course, result, semester
+    return Course(description=course, sp=sp, semester=semester, result=result)
 
 
 def load_page(driver):
-    update_status("Loading page...")
-    driver.get("https://sisastudent.uantwerpen.be")
-    wait_for_load(driver)
-    assert "Universiteit Antwerpen" in driver.title
+    attempt = 0
+    while attempt < 3:
+        try:
+            update_status("Loading page...")
+            driver.get("https://sisastudent.uantwerpen.be")
+            wait_for_load(driver)
+            assert "Universiteit Antwerpen" in driver.title
+            return
+        except AssertionError:
+            attempt += 1
 
 
 def check_online():
@@ -121,7 +178,7 @@ def set_online():
 def get_page_driver():
     # Selenium configuration
     opts = webdriver.FirefoxOptions()
-    opts.headless = False
+    opts.headless = True
     driver = webdriver.Firefox(options=opts)
     return driver
 
