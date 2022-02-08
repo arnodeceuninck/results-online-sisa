@@ -244,7 +244,7 @@ def log_time():
 
 
 def get_logged_time():
-    load_pickle("last.pickle", "unknown")
+    return load_pickle("last.pickle", "unknown")
 
 
 if __name__ == '__main__':
