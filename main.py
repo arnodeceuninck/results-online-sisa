@@ -135,7 +135,7 @@ def check_all_courses(driver, semesters_to_check=None, with_results_only=True):
             if course.semester not in semesters_to_check:
                 continue
 
-            if with_results_only and course.result != None:
+            if with_results_only and (course.result is not None and course.result != '' and course.result != ' '):
                 results.append(course)
 
             num_courses += 1
@@ -248,4 +248,9 @@ def get_logged_time():
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            main(manually=False, test=False)
+        except:
+            print(f"An error occured at {datetime.now()}")
+        sleep(30)

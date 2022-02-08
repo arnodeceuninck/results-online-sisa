@@ -6,7 +6,7 @@ from threadWithRetrun import ThreadWithReturn
 from threading import Thread
 from time import sleep
 
-bot = commands.Bot(command_prefix="-", description="Check wether results are online")
+bot = commands.Bot(command_prefix="-", description="Check whether results are online")
 
 
 @bot.event
