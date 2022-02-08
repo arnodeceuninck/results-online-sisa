@@ -15,7 +15,7 @@ async def on_ready():
 
 
 @bot.command()
-async def sisb(ctx, mode=None):
+async def sisa(ctx, mode=None):
     if mode not in ("check", "test", "run", "avg"):
         return await ctx.message.reply(f"Parameter 'run', 'check' or 'test' must be provided.")
 
